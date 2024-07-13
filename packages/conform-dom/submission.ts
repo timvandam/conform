@@ -14,9 +14,15 @@ export type SubmissionState = {
 	validated: Record<string, boolean>;
 };
 
+export type SubmissionPayload =
+	| string
+	| File
+	| SubmissionPayload[]
+	| { [key: string]: SubmissionPayload };
+
 export type SubmissionContext<Value = null, FormError = string[]> = {
 	intent: Intent | null;
-	payload: Record<string, unknown>;
+	payload: Record<string, SubmissionPayload>;
 	fields: Set<string>;
 	value?: Value;
 	error?: Record<string, FormError | null> | null;
@@ -26,13 +32,13 @@ export type SubmissionContext<Value = null, FormError = string[]> = {
 export type Submission<Schema, FormError = string[], FormValue = Schema> =
 	| {
 			status: 'success';
-			payload: Record<string, unknown>;
+			payload: Record<string, SubmissionPayload>;
 			value: FormValue;
 			reply(options?: ReplyOptions<FormError>): SubmissionResult<FormError>;
 	  }
 	| {
 			status: 'error' | undefined;
-			payload: Record<string, unknown>;
+			payload: Record<string, SubmissionPayload>;
 			error: Record<string, FormError | null> | null;
 			reply(options?: ReplyOptions<FormError>): SubmissionResult<FormError>;
 	  };
@@ -40,7 +46,7 @@ export type Submission<Schema, FormError = string[], FormValue = Schema> =
 export type SubmissionResult<FormError = string[]> = {
 	status?: 'error' | 'success';
 	intent?: Intent;
-	initialValue?: Record<string, unknown> | null;
+	initialValue?: Record<string, SubmissionPayload> | null;
 	fields?: string[];
 	error?: Record<string, FormError | null>;
 	state?: SubmissionState;
